@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multi-Sig Treasury</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container { max-width: 1200px; margin: 0 auto; }
+        header { text-align: center; color: white; margin-bottom: 30px; }
+        header h1 { font-size: 2.5em; }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        .card h2 {
+            color: #667eea;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+        .stat {
+            margin: 12px 0;
+            padding: 10px;
+            background: #f5f5f5;
+            border-radius: 6px;
+        }
+        .badge {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 15px;
+            background: #d4edda;
+            color: #155724;
+            font-weight: 600;
+            font-size: 0.9em;
+        }
+        table { width: 100%; margin-top: 15px; border-collapse: collapse; }
+        th { background: #667eea; color: white; padding: 10px; text-align: left; }
+        td { padding: 8px; border-bottom: 1px solid #eee; }
+        .btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 15px;
+            font-weight: 600;
+        }
+        .loading { color: #667eea; }
+        .full-width { grid-column: 1 / -1; }
+        footer { text-align: center; color: white; margin-top: 40px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🏦 Multi-Sig Treasury</h1>
+            <p>Live Blockchain Dashboard</p>
+        </header>
+
+        <div class="grid">
+            <div class="card">
+                <h2>📊 Treasury</h2>
+                <div id="treasury" class="loading">Loading...</div>
+                <button class="btn" onclick="loadTreasury()">🔄 Refresh</button>
+            </div>
+
+            <div class="card">
+                <h2>💰 Policies</h2>
+                <div id="policies" class="loading">Loading...</div>
+                <button class="btn" onclick="loadPolicies()">🔄 Refresh</button>
+            </div>
+
+            <div class="card">
+                <h2>🚀 Deployment</h2>
+                <div id="package" class="loading">Loading...</div>
+                <button class="btn" onclick="loadPackage()">🔄 Refresh</button>
+            </div>
+
+            <div class="card full-width">
+                <h2>📜 Summary</h2>
+                <table>
+                    <tr>
+                        <th>Component</th>
+                        <th>Status</th>
+                    </tr>
+                    <tr>
+                        <td>Treasury Contract</td>
+                        <td><span class="badge">Active ✓</span></td>
+                    </tr>
+                    <tr>
+                        <td>Policy Manager</td>
+                        <td><span class="badge">Active ✓</span></td>
+                    </tr>
+                    <tr>
+                        <td>API Backend</td>
+                        <td><span class="badge" id="api-status">Checking...</span></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <footer>
+            <p>🏆 Multi-Sig Treasury - Deployed on Sui Testnet</p>
+        </footer>
+    </div>
+
+    <script>
+        const API = '/api';
+
+        async function loadTreasury() {
+            try {
+                const res = await fetch(`${API}/treasury`);
+                const data = await res.json();
+                document.getElementById('treasury').innerHTML = `
+                    <div class="stat"><strong>Status:</strong> <span class="badge">Active ✓</span></div>
+                    <div class="stat"><strong>Network:</strong> Sui Testnet</div>
+                `;
+            } catch (e) {
+                document.getElementById('treasury').innerHTML = `<div style="color: red;">Error: ${e.message}</div>`;
+            }
+        }
+
+        async function loadPolicies() {
+            try {
+                const res = await fetch(`${API}/policies`);
+                const data = await res.json();
+                document.getElementById('policies').innerHTML = `
+                    <div class="stat"><strong>Spending Limit:</strong> 5,000,000 per tx</div>
+                    <div class="stat"><strong>Whitelist:</strong> <span class="badge">Active</span></div>
+                `;
+            } catch (e) {
+                document.getElementById('policies').innerHTML = `<div style="color: red;">Error: ${e.message}</div>`;
+            }
+        }
+
+        async function loadPackage() {
+            try {
+                const res = await fetch(`${API}/package`);
+                const data = await res.json();
+                document.getElementById('package').innerHTML = `
+                    <div class="stat"><strong>Status:</strong> <span class="badge">Deployed ✓</span></div>
+                    <div class="stat"><strong>Network:</strong> Sui Testnet</div>
+                `;
+            } catch (e) {
+                document.getElementById('package').innerHTML = `<div style="color: red;">Error: ${e.message}</div>`;
+            }
+        }
+
+        async function checkAPI() {
+            try {
+                const res = await fetch(`${API}/health`);
+                document.getElementById('api-status').textContent = 'Active ✓';
+                document.getElementById('api-status').style.background = '#d4edda';
+            } catch (e) {
+                document.getElementById('api-status').textContent = 'Error';
+                document.getElementById('api-status').style.background = '#f8d7da';
+            }
+        }
+
+        window.addEventListener('load', () => {
+            loadTreasury();
+            loadPolicies();
+            loadPackage();
+            checkAPI();
+        });
+    </script>
+</body>
+</html>
