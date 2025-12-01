@@ -1,19 +1,8 @@
 {
-  "version": 2,
-  "builds": [
-    {
-      "src": "backend/server.js",
-      "use": "@vercel/node"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "backend/server.js"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "frontend/index.html"
-    }
-  ]
+  "buildCommand": "cd backend && npm install",
+  "outputDirectory": "backend",
+  "framework": "express",
+  "env": {
+    "SUI_NETWORK": "testnet"
+  }
 }
